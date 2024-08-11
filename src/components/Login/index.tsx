@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Checkbox, message, Space, Avatar } from "antd";
-import axios from "axios";
+
+import api from "../../service";
 import "./login.css";
 
 const Login: React.FC = () => {
@@ -9,7 +10,7 @@ const Login: React.FC = () => {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      const response = await axios.post("https://fspp-api.onrender.com/api/v1/login", {
+      const response = await api.post("/api/v1/login", {
         email: values.email,
         password: values.password,
       });
