@@ -31,6 +31,7 @@ const { Option } = Select;
 
 const Dashboard = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false); // Estado para determinar se é uma atualização
   const [form] = Form.useForm();
   const [services, setServices] = useState<Service[]>([]);
 
@@ -77,7 +78,7 @@ const Dashboard = () => {
           date: values.dataRegistroServico.format("DD/MM/YYYY"),
           description: values.servicosPrestados,
         };
-
+  
         setServices([...services, newService]);
         form.resetFields([
           "dataRegistroServico",
@@ -85,8 +86,75 @@ const Dashboard = () => {
           "servicosPrestados",
         ]);
         setIsModalVisible(false);
+      })
+      .catch((error) => {
+        console.log("Campos com erro de validação no modal:", error.errorFields);
       });
   };
+  
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      const payload = {
+        nome: values.nomePaciente,
+        cpf: values.cpf,
+        sexo: values.sexo,
+        estadoCivil: values.estadoCivil,
+        idade: values.idade,
+        naturalidade: values.naturalidade,
+        profissao: values.profissao,
+        nomeMae: values.nomeMae,
+        nomePai: values.nomePai,
+        endereco: {
+          rua: values.rua,
+          numero: values.numero,
+          bairro: values.bairro,
+          cidade: values.cidade,
+          estado: values.estado,
+          cep: values.cep,
+        },
+        ams: values.ams,
+        dataRegistro: values.dataRegistro ? values.dataRegistro.toISOString() : null,
+        servicosPrestados: services.map(service => ({
+          date: moment(service.date, "DD/MM/YYYY").toISOString(),
+          responsible: service.name,
+          description: service.description,
+        })),
+      };
+  
+      console.log("Payload para salvar:", payload);
+  
+      if (isUpdate) {
+        const cpfValue = form.getFieldValue("cpf");
+        const response = await api.put(`/api/v1/paciente/cpf/${cpfValue}`, payload);
+        notification.success({
+          message: 'Paciente atualizado com sucesso',
+          description: `Paciente ${response.data.nome} foi atualizado.`,
+        });
+      } else {
+        const response = await api.post('/api/v1/pacientes', payload);
+        notification.success({
+          message: 'Paciente salvo com sucesso',
+          description: `Paciente ${response.data.nome} foi salvo.`,
+        });
+      }
+  
+      form.resetFields();
+      setServices([]);
+      setIsUpdate(false);
+    } catch (error: any) {
+      console.log("Erro na validação do formulário ou no envio:", error);
+      if (error.errorFields) {
+        console.log("Campos com erro de validação:", error.errorFields);
+      }
+      notification.error({
+        message: 'Erro ao salvar paciente',
+        description: 'Ocorreu um erro ao tentar salvar o paciente. Verifique os campos e tente novamente.',
+      });
+    }
+  };
+  
+  
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -131,6 +199,7 @@ const Dashboard = () => {
       }));
   
       setServices(formattedServices);
+      setIsUpdate(true); // Indica que o paciente já existe e deve ser atualizado
   
       // Exibe a mensagem de sucesso
       notification.success({
@@ -138,6 +207,7 @@ const Dashboard = () => {
         description: `Paciente: ${paciente.nome}`,
       });
     } catch (error) {
+      setIsUpdate(false); // Indica que o paciente não existe e deve ser criado
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         notification.error({
           message: "Paciente não encontrado",
@@ -172,26 +242,9 @@ const Dashboard = () => {
       "ams",
       "dataRegistro",
     ]);
+    setIsUpdate(false); // Reseta o estado de atualização
   };
-
-  const handleSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const payload = {
-          ...values,
-          services,
-        };
-
-        console.log("Payload para salvar:", payload);
-        // Aqui você pode enviar os dados para o backend via uma requisição POST, por exemplo:
-        // axios.post('/api/pacientes', payload)
-      })
-      .catch((errorInfo) => {
-        console.log("Erro na validação do formulário:", errorInfo);
-      });
-  };
-
+  
   return (
     <div className="layout-content">
       <Row justify="center" gutter={12}>
