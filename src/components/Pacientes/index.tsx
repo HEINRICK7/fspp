@@ -31,7 +31,7 @@ interface Service {
 
 const { Option } = Select;
 
-const Dashboard = () => {
+const Pacientes = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false); // Estado para determinar se é uma atualização
   const [form] = Form.useForm();
@@ -262,6 +262,7 @@ const Dashboard = () => {
       "ams",
       "dataRegistro",
     ]);
+    setServices([]);
     setIsUpdate(false); // Reseta o estado de atualização
   };
 
@@ -328,7 +329,7 @@ const Dashboard = () => {
                       onSearch={handleSearchCPF}
                       addonAfter={
                         <Space>
-                          <Button onClick={handleClearCPF}>Limpar</Button>
+                          <Button danger onClick={handleClearCPF}>Limpar</Button>
                         </Space>
                       }
                     />
@@ -547,4 +548,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Pacientes;

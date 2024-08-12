@@ -2,9 +2,11 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Dashboard from "./components/Dashboard";
+import Pacientes from "./components/Pacientes";
 import PrivateRoute from "./components/PrivateRoute";
 import AppLayout from "./components/AppLayout";
+import ListPacientes from "./components/Pacientes/ListPacientes";
+import PacienteDetalhes from "./components/Pacientes/PacienteDetalhes";
 
 const App: React.FC = () => {
   return (
@@ -13,11 +15,31 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route
-          path="/dashboard"
+          path="/pacientes"
           element={
             <PrivateRoute>
               <AppLayout>
-                <Dashboard />
+                <ListPacientes />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/pacientes/create"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Pacientes />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/pacientes/:cpf"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <PacienteDetalhes />
               </AppLayout>
             </PrivateRoute>
           }

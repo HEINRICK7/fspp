@@ -17,7 +17,7 @@ const Login: React.FC = () => {
       });
       message.success(response.data.message);
       // Redirecionar para a dashboard
-      navigate("/dashboard");
+      navigate("/pacientes");
     } catch (error) {
       message.error("Login failed. Please check your credentials.");
     } finally {

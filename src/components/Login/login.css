@@ -14,7 +14,8 @@
   padding: 100px;
   background: #FFF;
   width: 40vw;
-  height: 50vh;
+  max-height: 80vh;
+  min-height: 80vh;
   border-radius: 20px;
 }
 .btn-login{

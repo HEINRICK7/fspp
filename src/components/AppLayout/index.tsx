@@ -70,8 +70,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const renderMenuItems = () => (
     <>
-      <Menu.Item key="1" icon={<DashboardOutlined />}>
-        <Link to="/dashboard">Dashboard</Link>
+      <Menu.Item key="1" icon={<UsergroupAddOutlined />}>
+        <Link to="/pacientes">Pacientes</Link>
       </Menu.Item>
     </>
   );
