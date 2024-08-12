@@ -26,6 +26,7 @@ import {
 } from "@ant-design/icons";
 
 import { Footer } from "antd/es/layout/layout";
+import "./appLayout.css";
 
 const { Header, Sider, Content } = Layout;
 
@@ -99,7 +100,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             }}
           >
             <img
-              src={''}
+              src={""}
               alt="FSPP"
               style={{
                 width: "50%",
@@ -129,12 +130,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               padding: "10px",
             }}
           >
-            <Button
-              block
-              onClick={handleLogout}
-              
-              icon={<LogoutOutlined />}
-            >
+            <Button block onClick={handleLogout} icon={<LogoutOutlined />}>
               Sair
             </Button>
           </div>
@@ -142,17 +138,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       )}
 
       <Layout className="site-layout">
-        <Header
-          className="site-layout-background"
-
-        >
+        <Header>
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              alignContent: "center",
-              justifyContent: "space-between",
+              padding:0,
               color: "#FFF",
             }}
           >
@@ -171,8 +160,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-            >
-            </div>
+            ></div>
           </div>
         </Header>
         <Content
@@ -181,7 +169,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             margin: "24px 16px",
             padding: contentPadding,
             minHeight: 280,
-           
           }}
         >
           {children}
@@ -189,7 +176,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Footer
           style={{
             textAlign: "center",
-           
+
             height: "8vh",
             display: "flex",
             flexDirection: "row",
@@ -197,9 +184,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             alignItems: "center",
             color: "#FFFF",
           }}
-        >
-       
-        </Footer>
+        ></Footer>
       </Layout>
     </Layout>
   );
