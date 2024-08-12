@@ -26,14 +26,12 @@ const ListPacientes: React.FC = () => {
     setLoading(true);
     try {
       const response = await api.get("/api/v1/pacientes", { params: filters });
-      const patientsData = response.data.map(
-        (patient: any, index: number) => ({
-          key: index.toString(),
-          name: patient.nome,
-          cpf: patient.cpf,
-          id: patient.id,
-        })
-      );
+      const patientsData = response.data.map((patient: any, index: number) => ({
+        key: index.toString(),
+        name: patient.nome,
+        cpf: patient.cpf,
+        id: patient.id,
+      }));
       setPatients(patientsData);
     } catch (error) {
       notification.error({
@@ -80,11 +78,6 @@ const ListPacientes: React.FC = () => {
     <div className="layout-content">
       <Row justify="center" gutter={12}>
         <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-          <Typography.Title level={2}>
-            Lista de Pacientes
-          </Typography.Title>
-
-          {/* Adicione o FilterPanel */}
           <FilterPanel onSearch={handleSearch} />
 
           <Table
@@ -92,6 +85,29 @@ const ListPacientes: React.FC = () => {
             dataSource={patients}
             pagination={{ pageSize: 10 }}
             loading={loading}
+            title={() => {
+              return (
+                <Row justify={"space-between"}>
+                  <Typography.Title level={2} style={{ color: "white" }}>
+                    Lista de Pacientes
+                  </Typography.Title>
+
+                  <Space>
+                    <Col>
+                      <Button
+                        icon={
+                          <PlusOutlined
+                            style={{ color: "#1DA57A", background: "#FFF" }}
+                          />
+                        }
+                        onClick={() => navigate(`/pacientes/create`)}
+                        title={"Novo"}
+                      />
+                    </Col>
+                  </Space>
+                </Row>
+              );
+            }}
           />
         </Col>
       </Row>

@@ -474,7 +474,7 @@ const Pacientes = () => {
               <Table
                 columns={columns}
                 dataSource={services}
-                pagination={{ pageSize: 10 }}
+                pagination={{ pageSize: 4 }}
               />
 
               <Button
