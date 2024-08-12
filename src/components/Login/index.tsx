@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Checkbox, message, Space, Avatar } from "antd";
+import { useNavigate } from "react-router-dom";
 
 import api from "../../service";
 import "./login.css";
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
@@ -15,6 +16,8 @@ const Login: React.FC = () => {
         password: values.password,
       });
       message.success(response.data.message);
+      // Redirecionar para a dashboard
+      navigate("/dashboard");
     } catch (error) {
       message.error("Login failed. Please check your credentials.");
     } finally {
@@ -32,13 +35,12 @@ const Login: React.FC = () => {
       >
         {" "}
         <div className="container-logo">
-          
-        <Avatar
-          style={{ padding: 100, alignItems: 'center' }}
-          size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-        >
-          FSPP
-        </Avatar>
+          <Avatar
+            style={{ padding: 100, alignItems: "center" }}
+            size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
+          >
+            FSPP
+          </Avatar>
         </div>
         <Form.Item
           name="email"
