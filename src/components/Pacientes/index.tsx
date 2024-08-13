@@ -560,7 +560,7 @@ const Pacientes = () => {
                   </Form.Item>
                 </Col>
               </Row>
-              <Divider />
+              <Divider/>
               <Table
                 columns={columns}
                 dataSource={services}
@@ -568,22 +568,27 @@ const Pacientes = () => {
                 title={() => {
                   return (
                     <Row justify={"space-between"}>
-                      <h2 style={{ color: "white" }}>
+                      <Typography.Title level={4} style={{ color: "white" }}>
                         Serviços Prestados
-                      </h2>
+                      </Typography.Title>
+
+                      <Space>
+                        <Col>
+                          <Button
+                            icon={
+                              <PlusOutlined
+                                style={{ color: "#1DA57A", background: "#FFF" }}
+                              />
+                            }
+                            onClick={showModal}
+                            title={"Novo"}
+                          />
+                        </Col>
+                      </Space>
                     </Row>
                   );
                 }}
               />
-
-              <Button
-                type="dashed"
-                onClick={showModal}
-                icon={<PlusOutlined />}
-                style={{ marginTop: 16 }}
-              >
-                Adicionar Serviço
-              </Button>
 
               <Row justify="end" style={{ marginTop: 16 }}>
                 <Space>
