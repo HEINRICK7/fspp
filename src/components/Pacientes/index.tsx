@@ -559,7 +559,7 @@ const Pacientes = () => {
                   </Form.Item>
                 </Col>
               </Row>
-              <Divider/>
+              <Divider />
               <Table
                 columns={columns}
                 dataSource={services}
@@ -591,8 +591,17 @@ const Pacientes = () => {
 
               <Row justify="end" style={{ marginTop: 16 }}>
                 <Space>
-                  <Button onClick={handleClearCPF}>Cancelar</Button>
-                  <Button type="primary" onClick={handleSave}>
+                  <Button
+                    style={{ minWidth: "100px" }}
+                    onClick={handleClearCPF}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="primary"
+                    style={{ minWidth: "100px" }}
+                    onClick={handleSave}
+                  >
                     Salvar
                   </Button>
                 </Space>

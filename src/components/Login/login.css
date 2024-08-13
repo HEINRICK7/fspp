@@ -22,6 +22,7 @@
   font-weight: 900;
   background: #1DA57A;
   color: #fff;
+  min-width: 100%;
 }
 .container-logo {
   padding: 20px;
