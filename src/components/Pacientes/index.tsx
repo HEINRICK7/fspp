@@ -80,12 +80,11 @@ const Pacientes = () => {
           ) : (
             <div style={{ display: "flex" }}>
               <Button
-                type="primary"
+                type="default"
                 icon={<EditOutlined />}
                 onClick={() => handleEdit(record.key)}
               ></Button>
               <Button
-                type="primary"
                 danger
                 icon={<DeleteOutlined />}
                 onClick={() => handleDelete(record.key)}
