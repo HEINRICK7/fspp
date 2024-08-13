@@ -6,3 +6,10 @@ html,
   margin: 0;
   padding: 0;
 }
+.ant-input, .ant-picker, .ant-input-group-addon{
+  height: 40px;
+}
+.ant-btn.ant-btn-default, .ant-btn-icon-only, .ant-input-search-button{
+  height: 40px;
+  width: 40px;
+}

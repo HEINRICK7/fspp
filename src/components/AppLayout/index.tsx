@@ -141,12 +141,14 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 }
               )}
             </div>
-            <div
-              style={{
-                width: "80px",
-              }}
-            >
-              <Button block onClick={handleLogout} icon={<LogoutOutlined />}>
+            <div>
+              <Button
+                style={{
+                  minWidth: 80,
+                }}
+                onClick={handleLogout}
+                icon={<LogoutOutlined />}
+              >
                 Sair
               </Button>
             </div>
