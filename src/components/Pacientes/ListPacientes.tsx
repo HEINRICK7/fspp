@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Row, Typography, Col, notification } from "antd";
-import { EyeOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
+import { PrinterOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import api from "../../service";
 import FilterPanel from "./FilterPanel"; // Importe o FilterPanel
@@ -66,7 +66,7 @@ const ListPacientes: React.FC = () => {
       render: (_: any, record: Patient) => (
         <Space size="middle">
           <Button
-            icon={<EyeOutlined />}
+            icon={<PrinterOutlined />}
             onClick={() => navigate(`/pacientes/${record.cpf}`)}
           />
           <Button
