@@ -12,6 +12,7 @@ import { useReactToPrint } from "react-to-print";
 import HeaderGovernoPI from "../HeaderGovernoMt.report";
 import "./formPacientes.css";
 import api from "../../service";
+import { useNavigate } from "react-router-dom";
 
 interface Service {
   date: string;
@@ -45,7 +46,11 @@ export default function PacienteDetalhes() {
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
   const componentRef = useRef<HTMLDivElement>(null); // Referência para impressão
+  const navigate = useNavigate();
 
+  const handleBack = () => {
+    navigate(-1); // Volta para a página anterior
+  };
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
@@ -89,7 +94,7 @@ export default function PacienteDetalhes() {
                 display: "inline-block",
                 alignItems: "left",
               }}
-              style={{ paddingTop: 0, paddingBottom: 8 }}
+              className={item.className}
             >
               {item.value}
             </Descriptions.Item>
@@ -100,21 +105,41 @@ export default function PacienteDetalhes() {
   };
 
   const servicesData =
-    patient?.servicosPrestados
-      ?.map((service, index) => [
-        { label: `Responsável`, value: service.responsible },
-        { label: `Data`, value: service.date },
-        { label: `Descrição`, value: service.description, span: 2 },
-      ])
-      .flat() || [];
+  patient?.servicosPrestados
+    ?.map((service, index) => [
+      {
+        label: `Responsável`,
+        value: service.responsible,
+        className: "responsavel-column",
+      },
+      {
+        label: `Data`,
+        value: new Date(service.date).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+        className: "data-column",
+      },
+      {
+        label: `Descrição`,
+        value: service.description,
+        className: "descricao-column",
+      },
+    ])
+    .flat() || [];
+
 
   if (loading) return <p>Carregando...</p>;
 
   return (
     <>
+      <Button onClick={handleBack} type="default" className="no-print">
+        Voltar
+      </Button>
       <Button
         onClick={handlePrint}
-        style={{ margin: 20 }}
+        style={{ margin: 10 }}
         type="primary"
         className="no-print"
       >

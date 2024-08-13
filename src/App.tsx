@@ -44,6 +44,16 @@ const App: React.FC = () => {
             </PrivateRoute>
           }
         />
+         <Route
+          path="/paciente/:cpf/editar"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Pacientes isEditMode={true} />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );

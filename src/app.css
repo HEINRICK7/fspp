@@ -11,5 +11,6 @@ html,
 }
 .ant-btn.ant-btn-default, .ant-btn-icon-only, .ant-input-search-button{
   height: 40px;
-  width: 40px;
+  max-width: auto;
+  min-height: 40px;
 }

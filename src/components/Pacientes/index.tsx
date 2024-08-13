@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -25,6 +25,7 @@ import axios from "axios";
 import moment from "moment";
 import api from "../../service";
 import "./formPacientes.css";
+import { useParams } from "react-router-dom";
 
 interface Service {
   _id?: string;
@@ -36,17 +37,24 @@ interface Service {
 
 const { Option } = Select;
 
-const Pacientes = () => {
+const Pacientes = ({ cpfParam = '', isEditMode = false }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(isEditMode);
   const [form] = Form.useForm();
   const [services, setServices] = useState<Service[]>([]);
   const [servicesPayload, setServicesPayload] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingServiceKey, setEditingServiceKey] = useState<number | null>(
-    null
-  );
+  const [editingServiceKey, setEditingServiceKey] = useState<number | null>(null);
   const [modalForm] = Form.useForm();
+  const { cpf } = useParams<{ cpf: string }>();
+
+
+  // Load data when editing
+  useEffect(() => {
+    if (isEditMode && cpf) {
+      handleSearchCPF(cpf);
+    }
+  }, [cpf, isEditMode]);
 
   const columns = [
     {
@@ -103,17 +111,10 @@ const Pacientes = () => {
 
   const handleOk = () => {
     modalForm
-      .validateFields([
-        "dataRegistroServico",
-        "responsavel",
-        "servicosPrestados",
-      ])
+      .validateFields(["dataRegistroServico", "responsavel", "servicosPrestados"])
       .then((values) => {
         const newService: Service = {
-          key:
-            editingServiceKey !== null
-              ? editingServiceKey
-              : services.length + 1,
+          key: editingServiceKey !== null ? editingServiceKey : services.length + 1,
           name: values.responsavel,
           date: values.dataRegistroServico.format("DD/MM/YYYY"),
           description: values.servicosPrestados,
@@ -128,15 +129,12 @@ const Pacientes = () => {
           setServices([newService, ...services]);
         }
 
-        modalForm.resetFields(); // Reseta apenas o modalForm
+        modalForm.resetFields();
         setEditingServiceKey(null);
         setIsModalVisible(false);
       })
       .catch((error) => {
-        console.log(
-          "Campos com erro de validação no modal:",
-          error.errorFields
-        );
+        console.log("Campos com erro de validação no modal:", error.errorFields);
       });
   };
 
@@ -162,9 +160,7 @@ const Pacientes = () => {
           cep: values.cep,
         },
         ams: values.ams,
-        dataRegistro: values.dataRegistro
-          ? values.dataRegistro.toISOString()
-          : null,
+        dataRegistro: values.dataRegistro ? values.dataRegistro.toISOString() : null,
         servicosPrestados: services.map((service) => ({
           date: moment(service.date, "DD/MM/YYYY").toISOString(),
           responsible: service.name,
@@ -174,10 +170,7 @@ const Pacientes = () => {
 
       if (isUpdate) {
         const cpfValue = form.getFieldValue("cpf");
-        const response = await api.put(
-          `/api/v1/paciente/cpf/${cpfValue}`,
-          payload
-        );
+        const response = await api.put(`/api/v1/paciente/cpf/${cpfValue}`, payload);
         notification.success({
           message: "Paciente atualizado com sucesso",
           description: `Paciente ${response.data.nome} foi atualizado.`,
@@ -244,15 +237,16 @@ const Pacientes = () => {
     });
   };
 
-  const handleSearchCPF = async () => {
+  const handleSearchCPF = async (cpf?: string) => {
     setLoading(true);
     try {
-      const cpfValue = form.getFieldValue("cpf");
+      const cpfValue = cpf || form.getFieldValue("cpf");
       const response = await api.get(`/api/v1/paciente/cpf/${cpfValue}`);
       const paciente = response.data;
 
       form.setFieldsValue({
         nomePaciente: paciente.nome,
+        cpf: paciente.cpf,
         sexo: paciente.sexo,
         estadoCivil: paciente.estadoCivil,
         idade: paciente.idade,
@@ -267,9 +261,7 @@ const Pacientes = () => {
         estado: paciente.endereco.estado,
         cep: paciente.endereco.cep,
         ams: paciente.ams,
-        dataRegistro: paciente.dataRegistro
-          ? moment(paciente.dataRegistro)
-          : null,
+        dataRegistro: paciente.dataRegistro ? moment(paciente.dataRegistro) : null,
       });
 
       const formattedServices = paciente.servicosPrestados.map(
@@ -338,11 +330,12 @@ const Pacientes = () => {
     setServices([]);
     setIsUpdate(false);
   };
+
   const showServiceDetails = (service: Service) => {
     Modal.info({
       title: "Detalhes do Serviço",
       width: "50%",
-      height: "70%",
+      height: "100vw",
       content: (
         <Space direction="vertical">
           <Typography.Text>
@@ -350,6 +343,7 @@ const Pacientes = () => {
           </Typography.Text>
           <Typography.Text>
             <strong>Data:</strong> {service.date}
+            <Divider/>
           </Typography.Text>
           <Typography.Text>
             <strong>Descrição:</strong> {service.description}
@@ -359,6 +353,7 @@ const Pacientes = () => {
       onOk() {},
     });
   };
+
   return (
     <div className="layout-content">
       <Row justify="center" gutter={12}>
@@ -368,7 +363,7 @@ const Pacientes = () => {
               orientation="left"
               style={{ fontWeight: 900, color: "#7e9bad" }}
             >
-              Formulário de Serviços Prestados ao Paciente
+              {isUpdate ? "Editar Paciente" : "Formulário de Serviços Prestados ao Paciente"}
             </Divider>
           </Typography.Title>
           <Spin spinning={loading}>
@@ -420,11 +415,13 @@ const Pacientes = () => {
                     <Input.Search
                       placeholder="Digite o CPF"
                       onSearch={handleSearchCPF}
+                      disabled={isUpdate} // Desabilita o campo CPF no modo de edição
                       addonAfter={
                         <Space>
                           <Button
                             icon={<DeleteOutlined />}
                             danger
+                            disabled={isUpdate}
                             onClick={handleClearCPF}
                           ></Button>
                         </Space>
@@ -602,7 +599,7 @@ const Pacientes = () => {
                     style={{ minWidth: "100px" }}
                     onClick={handleSave}
                   >
-                    Salvar
+                    {isUpdate ? "Atualizar" : "Salvar"}
                   </Button>
                 </Space>
               </Row>
