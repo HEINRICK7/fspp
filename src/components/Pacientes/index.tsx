@@ -15,14 +15,19 @@ import {
   notification,
   Spin,
 } from "antd";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
 import api from "../../service";
 import "./formPacientes.css";
 
-// Define a interface para o serviço
 interface Service {
+  _id?: string;
   key: number;
   name: string;
   date: string;
@@ -33,21 +38,28 @@ const { Option } = Select;
 
 const Pacientes = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false); // Estado para determinar se é uma atualização
+  const [isUpdate, setIsUpdate] = useState(false);
   const [form] = Form.useForm();
   const [services, setServices] = useState<Service[]>([]);
+  const [servicesPayload, setServicesPayload] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingServiceKey, setEditingServiceKey] = useState<number | null>(
+    null
+  );
+  const [modalForm] = Form.useForm();
 
   const columns = [
     {
       title: "Nome",
       dataIndex: "name",
       key: "name",
+      width: "200px",
     },
     {
       title: "Data",
       dataIndex: "date",
       key: "date",
+      width: "200px",
     },
     {
       title: "Descrição",
@@ -58,8 +70,30 @@ const Pacientes = () => {
       title: "Ações",
       key: "actions",
       width: "100px",
-      render: (_: any, record: any) => (
-        <Button onClick={() => handleEdit(record.key)}>Editar</Button>
+      render: (_: any, record: Service) => (
+        <>
+          {servicesPayload.find((service) => service.key === record.key) ? (
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => showServiceDetails(record)}
+            ></Button>
+          ) : (
+            <div style={{ display: "flex" }}>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => handleEdit(record.key)}
+              ></Button>
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => handleDelete(record.key)}
+                style={{ marginLeft: 8 }}
+              ></Button>
+            </div>
+          )}
+        </>
       ),
     },
   ];
@@ -69,7 +103,7 @@ const Pacientes = () => {
   };
 
   const handleOk = () => {
-    form
+    modalForm
       .validateFields([
         "dataRegistroServico",
         "responsavel",
@@ -77,18 +111,26 @@ const Pacientes = () => {
       ])
       .then((values) => {
         const newService: Service = {
-          key: services.length + 1,
+          key:
+            editingServiceKey !== null
+              ? editingServiceKey
+              : services.length + 1,
           name: values.responsavel,
           date: values.dataRegistroServico.format("DD/MM/YYYY"),
           description: values.servicosPrestados,
         };
 
-        setServices([...services, newService]);
-        form.resetFields([
-          "dataRegistroServico",
-          "responsavel",
-          "servicosPrestados",
-        ]);
+        if (editingServiceKey !== null) {
+          const updatedServices = services.map((service) =>
+            service.key === editingServiceKey ? newService : service
+          );
+          setServices(updatedServices);
+        } else {
+          setServices([newService, ...services]);
+        }
+
+        modalForm.resetFields(); // Reseta apenas o modalForm
+        setEditingServiceKey(null);
         setIsModalVisible(false);
       })
       .catch((error) => {
@@ -131,8 +173,6 @@ const Pacientes = () => {
         })),
       };
 
-      console.log("Payload para salvar:", payload);
-
       if (isUpdate) {
         const cpfValue = form.getFieldValue("cpf");
         const response = await api.put(
@@ -168,21 +208,50 @@ const Pacientes = () => {
   };
 
   const handleCancel = () => {
+    modalForm.resetFields();
+    setEditingServiceKey(null);
     setIsModalVisible(false);
   };
 
-  const handleEdit = (key: any) => {
-    showModal();
+  const handleEdit = (key: number) => {
+    const serviceToEdit = services.find((service) => service.key === key);
+    if (serviceToEdit) {
+      modalForm.setFieldsValue({
+        dataRegistroServico: moment(serviceToEdit.date, "DD/MM/YYYY"),
+        responsavel: serviceToEdit.name,
+        servicosPrestados: serviceToEdit.description,
+      });
+      setEditingServiceKey(key);
+      setIsModalVisible(true);
+    }
+  };
+
+  const handleDelete = (key: number) => {
+    Modal.confirm({
+      title: "Confirmação de Exclusão",
+      content: "Tem certeza de que deseja excluir este serviço?",
+      okText: "Sim",
+      okType: "danger",
+      cancelText: "Não",
+      onOk: () => {
+        const updatedServices = services.filter(
+          (service) => service.key !== key
+        );
+        setServices(updatedServices);
+        notification.success({
+          message: "Serviço excluído com sucesso",
+        });
+      },
+    });
   };
 
   const handleSearchCPF = async () => {
-    setLoading(true);  // Ativa o Spin
+    setLoading(true);
     try {
       const cpfValue = form.getFieldValue("cpf");
       const response = await api.get(`/api/v1/paciente/cpf/${cpfValue}`);
       const paciente = response.data;
-  
-      // Popula o formulário com os dados do paciente
+
       form.setFieldsValue({
         nomePaciente: paciente.nome,
         sexo: paciente.sexo,
@@ -203,8 +272,7 @@ const Pacientes = () => {
           ? moment(paciente.dataRegistro)
           : null,
       });
-  
-      // Popula a tabela com os serviços prestados
+
       const formattedServices = paciente.servicosPrestados.map(
         (service: any, index: number) => ({
           key: index + 1,
@@ -213,17 +281,24 @@ const Pacientes = () => {
           description: service.description,
         })
       );
-  
+      const formattedPayloadServices = paciente.servicosPrestados.map(
+        (service: any, index: number) => ({
+          key: index + 1,
+          name: service.responsible,
+          date: moment(service.date).format("DD/MM/YYYY"),
+          description: service.description,
+        })
+      );
+      setServicesPayload(formattedPayloadServices);
       setServices(formattedServices);
-      setIsUpdate(true); // Indica que o paciente já existe e deve ser atualizado
-  
-      // Exibe a mensagem de sucesso
+      setIsUpdate(true);
+
       notification.success({
         message: `Usuário encontrado`,
         description: `Paciente: ${paciente.nome}`,
       });
     } catch (error) {
-      setIsUpdate(false); // Indica que o paciente não existe e deve ser criado
+      setIsUpdate(false);
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         notification.error({
           message: "Paciente não encontrado",
@@ -237,10 +312,9 @@ const Pacientes = () => {
         });
       }
     } finally {
-      setLoading(false);  // Desativa o Spin
+      setLoading(false);
     }
   };
-  
 
   const handleClearCPF = () => {
     form.resetFields([
@@ -263,9 +337,29 @@ const Pacientes = () => {
       "dataRegistro",
     ]);
     setServices([]);
-    setIsUpdate(false); // Reseta o estado de atualização
+    setIsUpdate(false);
   };
-
+  const showServiceDetails = (service: Service) => {
+    Modal.info({
+      title: "Detalhes do Serviço",
+      width: "50%",
+      height: "70%",
+      content: (
+        <Space direction="vertical">
+          <Typography.Text>
+            <strong>Responsável:</strong> {service.name}
+          </Typography.Text>
+          <Typography.Text>
+            <strong>Data:</strong> {service.date}
+          </Typography.Text>
+          <Typography.Text>
+            <strong>Descrição:</strong> {service.description}
+          </Typography.Text>
+        </Space>
+      ),
+      onOk() {},
+    });
+  };
   return (
     <div className="layout-content">
       <Row justify="center" gutter={12}>
@@ -329,7 +423,9 @@ const Pacientes = () => {
                       onSearch={handleSearchCPF}
                       addonAfter={
                         <Space>
-                          <Button danger onClick={handleClearCPF}>Limpar</Button>
+                          <Button danger onClick={handleClearCPF}>
+                            Limpar
+                          </Button>
                         </Space>
                       }
                     />
@@ -505,7 +601,10 @@ const Pacientes = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form layout="vertical" form={form}>
+        <Form
+          form={modalForm} // Use o modalForm aqui
+          layout="vertical"
+        >
           <Form.Item
             label="Data do Registro"
             name="dataRegistroServico"
