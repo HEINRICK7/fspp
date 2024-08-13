@@ -88,7 +88,7 @@ const ListPacientes: React.FC = () => {
             title={() => {
               return (
                 <Row justify={"space-between"}>
-                  <Typography.Title level={2} style={{ color: "white" }}>
+                  <Typography.Title level={3} style={{ color: "white" }}>
                     Lista de Pacientes
                   </Typography.Title>
 

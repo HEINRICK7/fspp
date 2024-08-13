@@ -423,9 +423,11 @@ const Pacientes = () => {
                       onSearch={handleSearchCPF}
                       addonAfter={
                         <Space>
-                          <Button danger onClick={handleClearCPF}>
-                            Limpar
-                          </Button>
+                          <Button
+                            icon={<DeleteOutlined />}
+                            danger
+                            onClick={handleClearCPF}
+                          ></Button>
                         </Space>
                       }
                     />
@@ -558,19 +560,20 @@ const Pacientes = () => {
                   </Form.Item>
                 </Col>
               </Row>
-
-              <Typography.Title level={3}>
-                <Divider
-                  orientation="left"
-                  style={{ fontWeight: 900, color: "#7e9bad" }}
-                >
-                  Serviços Prestados
-                </Divider>
-              </Typography.Title>
+              <Divider />
               <Table
                 columns={columns}
                 dataSource={services}
                 pagination={{ pageSize: 4 }}
+                title={() => {
+                  return (
+                    <Row justify={"space-between"}>
+                      <h2 style={{ color: "white" }}>
+                        Serviços Prestados
+                      </h2>
+                    </Row>
+                  );
+                }}
               />
 
               <Button

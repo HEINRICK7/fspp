@@ -1,6 +1,7 @@
 
 .ant-table-thead > tr > th {
-  border-bottom: none; /* Remove a borda inferior do cabeçalho */
+  border-bottom: none;
+  background-color: #1da57a2c !important;
 }
 
 .ant-table-tbody > tr > td {
@@ -104,6 +105,7 @@
 
 .ant-table-title {
   background-color: #1DA57A;
+  padding: 0 10px !important;
 }
 
 .anticon anticon-menu-fold trigger {

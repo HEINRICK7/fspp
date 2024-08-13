@@ -8,6 +8,7 @@ import {
   Row,
   Typography,
   Image,
+  Avatar,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,6 +24,7 @@ import {
   MenuUnfoldOutlined,
   DollarOutlined,
   MinusCircleOutlined,
+  AntDesignOutlined,
 } from "@ant-design/icons";
 
 import { Footer } from "antd/es/layout/layout";
@@ -77,7 +79,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <Layout
+      style={{ minHeight: "50vh", background: "#f0f2f5", position: "relative" }}
+    >
       {!sidebarHidden && (
         <Sider
           trigger={null}
@@ -99,14 +103,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               flexDirection: "row",
             }}
           >
-            <img
-              src={""}
-              alt="FSPP"
-              style={{
-                width: "50%",
-                borderRadius: "50%",
-                padding: "2px",
-              }}
+            <Avatar
+              size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
+              icon={<AntDesignOutlined />}
             />
           </div>
           <Menu
@@ -121,46 +120,36 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           >
             {renderMenuItems()}
           </Menu>
-          <div
-            style={{
-              position: "relative",
-              bottom: 0,
-              width: "100%",
-              borderTop: "1px solid #f0f0f0",
-              padding: "10px",
-            }}
-          >
-            <Button block onClick={handleLogout} icon={<LogoutOutlined />}>
-              Sair
-            </Button>
-          </div>
         </Sider>
       )}
 
       <Layout className="site-layout">
         <Header>
-          <div
-            style={{
-              padding:0,
-              color: "#FFF",
-            }}
-          >
-            {React.createElement(
-              sidebarHidden ? MenuUnfoldOutlined : MenuFoldOutlined,
-              {
-                className: "trigger",
-                onClick: toggle,
-                style: { fontSize: "24px", marginLeft: 20 },
-              }
-            )}
+          <div className="header-layout">
             <div
               style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
+                padding: 0,
+                color: "#FFF",
               }}
-            ></div>
+            >
+              {React.createElement(
+                sidebarHidden ? MenuUnfoldOutlined : MenuFoldOutlined,
+                {
+                  className: "trigger",
+                  onClick: toggle,
+                  style: { fontSize: "24px", marginLeft: 20 },
+                }
+              )}
+            </div>
+            <div
+              style={{
+                width: "80px",
+              }}
+            >
+              <Button block onClick={handleLogout} icon={<LogoutOutlined />}>
+                Sair
+              </Button>
+            </div>
           </div>
         </Header>
         <Content

@@ -5,3 +5,11 @@
   margin: 0;
   padding: 0;
 }
+.header-layout{
+  margin:0 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+}
